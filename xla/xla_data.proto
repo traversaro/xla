@@ -113,10 +113,12 @@ enum PrimitiveType {
   // https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf
   //
   // F4E2M1FN has 2 exponent bits and 1 mantissa bit.
+  // F8E8M0FNU has 8 exponent bits, no mantissa and no sign.
   //
   // Only finite values are supported (hence "FN" suffix). Unlike IEEE types,
   // infinities and NaNs are not supported.
   F4E2M1FN = 30;
+  F8E8M0FNU = 31;
 
   // Complex values of fixed width.
   C64 = 15;   // Paired F32 (real, imag), as in std::complex<float>.
@@ -143,7 +145,7 @@ enum PrimitiveType {
   // primitive type will have empty dimensions and tuple_shapes fields.
   TOKEN = 17;
 
-  // Next = 31
+  // Next = 32
 }
 // LINT.ThenChange(
 //   https://www.tensorflow.org/code/tensorflow/compiler/xla/tools/driver.cc
@@ -596,8 +598,9 @@ message LiteralProto {
   bytes f8e4m3s = 28;
   bytes f8e5m2fnuzs = 24;
   bytes f8e5m2s = 19;
+  bytes f8e8m0fnus = 31;
   repeated int64 sparse_indices = 14;
-  // Next = 31
+  // Next = 32
 }
 
 message WindowDimension {

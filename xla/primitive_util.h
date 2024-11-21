@@ -218,6 +218,11 @@ constexpr PrimitiveType NativeToPrimitiveType<tsl::float8_e3m4>() {
   return F8E3M4;
 }
 
+template <>
+constexpr PrimitiveType NativeToPrimitiveType<tsl::float8_e8m0fnu>() {
+  return F8E8M0FNU;
+}
+
 // Complex
 template <>
 constexpr PrimitiveType NativeToPrimitiveType<complex64>() {
@@ -362,6 +367,11 @@ struct PrimitiveTypeToNative<F8E3M4> {
   using type = tsl::float8_e3m4;
 };
 
+template <>
+struct PrimitiveTypeToNative<F8E8M0FNU> {
+  using type = tsl::float8_e8m0fnu;
+};
+
 // Complex
 template <>
 struct PrimitiveTypeToNative<C64> {
@@ -394,7 +404,9 @@ inline constexpr bool IsArrayType(PrimitiveType primitive_type) {
          primitive_type < PrimitiveType_ARRAYSIZE;
 }
 
-constexpr bool IsMXType(PrimitiveType type) { return type == F4E2M1FN; }
+constexpr bool IsMXType(PrimitiveType type) {
+  return type == F4E2M1FN || type == F8E8M0FNU;
+}
 
 constexpr bool IsF8Type(PrimitiveType type) {
   return type == F8E5M2 || type == F8E4M3 || type == F8E4M3FN ||
@@ -488,6 +500,9 @@ constexpr R FloatingPointTypeSwitch(F&& f, PrimitiveType type) {
       case F8E5M2FNUZ:
         return std::forward<F>(f)(
             PrimitiveTypeConstant<PrimitiveType::F8E5M2FNUZ>());
+      case F8E8M0FNU:
+        return std::forward<F>(f)(
+            PrimitiveTypeConstant<PrimitiveType::F8E8M0FNU>());
       case F16:
         return std::forward<F>(f)(PrimitiveTypeConstant<PrimitiveType::F16>());
       case BF16:
@@ -709,6 +724,10 @@ inline bool CastPreservesValues(PrimitiveType from_type,
   // * -> *
   if (from_type == to_type) {
     return true;
+  }
+  // * -> F8E8M0FNU is not possible because zero cannot be represented.
+  if (to_type == F8E8M0FNU) {
+    return false;
   }
   // PRED -> *
   if (from_type == PRED) {
